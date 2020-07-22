@@ -31,7 +31,7 @@ var darkMap = L.tileLayer("https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z
   // Create a map object
   var myMap = L.map("map", {
     center: [37.09, -95.71],
-    zoom: 5,
+    zoom: 4,
     layers: [streetMap,earthquake]
   });
 
@@ -42,10 +42,10 @@ var darkMap = L.tileLayer("https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z
 }
 
 
-var url = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson"
+var url = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson"
 
 function getRadius(magnitude) {
-    return magnitude * 3;
+    return magnitude * 3.5;
 };
 
 var earthquake = new L.LayerGroup();
@@ -81,16 +81,16 @@ d3.json(url, function(eqData) {
 function color(magnitude) {
     // We create a fillColor for the style function using magnitude
     if (magnitude > 5) {
-        return 'red'
+        return "#C0392B"
     } else if (magnitude > 4) {
-        return 'darkorange'
+        return "#D35400"
     } else if (magnitude > 3) {
-        return 'orange'
+        return "#E67E22"
     } else if (magnitude > 2) {
-        return 'yellow'
+        return "#F39C12"
     } else if (magnitude > 1) {
-        return 'lightyellow'
+        return "#F1C40F"
     } else {
-        return 'green'
+        return "#2ECC71"
     }
 };
