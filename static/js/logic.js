@@ -1,53 +1,96 @@
-d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson", function(earthquakeData) {
-     console.log(earthquakeData);
 
-     // Create a map object
-     var myMap = L.map("map", {
-       center: [37.09, -95.71],
-       zoom: 5
-     });
+function createMap() {
+  // Add a tile layers
+  var streetmap = L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
+    attribution: "© <a href='https://www.mapbox.com/about/maps/'>Mapbox</a> © <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> <strong><a href='https://www.mapbox.com/map-feedback/' target='_blank'>Improve this map</a></strong>",
+    tileSize: 512,
+    maxZoom: 18,
+    zoomOffset: -1,
+    id: "mapbox/streets-v11",
+    accessToken: API_KEY
+  });
+  var lightmap = L.tileLayer("https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
+    attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
+    tileSize: 512,
+    maxZoom: 18,
+    id: "light-v10",
+    accessToken: API_KEY
+  });
+    // Create a baseMaps object to hold the street & lightmap layer
+  var baseMaps = {
+    "Street Map": streetmap,
+    "Light Map": lightmap
+  };
 
-     // Add a tile layer
-     L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
-       attribution: "© <a href='https://www.mapbox.com/about/maps/'>Mapbox</a> © <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> <strong><a href='https://www.mapbox.com/map-feedback/' target='_blank'>Improve this map</a></strong>",
-       tileSize: 512,
-       maxZoom: 18,
-       zoomOffset: -1,
-       id: "mapbox/streets-v11",
-       accessToken: API_KEY
-     }).addTo(myMap);
+  // Create an overlayMaps object to hold the earthquake layer
+  var overlayMaps = {
+    "Earthquakes": earthquake
+  };
 
-     earthquakeData.forEach(function(data) {
-        if (data.features && data.features.coordinates) {
-            var latlng = [data.geometry.coordinates[1], data.geometry.coordinates[0]];
-            console.log(latlng);
-            // var marker = L.marker(latlng)
-            //marker.bindPopup(`<p>${data.descript}</p>`);
-            marker.addTo(myMap);
-        }
-    });
+  // Create the map object with options
+  // Create a map object
+  var myMap = L.map("map", {
+    center: [37.09, -95.71],
+    zoom: 5
+    layers: [lightmap,earthquake]
+  });
 
-    // Here we add a GeoJSON layer to the map once the file is loaded.
-  L.geoJson(data, {
-    // We turn each feature into a circleMarker on the map.
-    pointToLayer: function(feature, latlng) {
-      return L.circleMarker(latlng);
-    },
-    // We set the style for each circleMarker using our styleInfo function.
-    style: styleInfo,
-    // We create a popup for each marker to display the magnitude and location of the earthquake after the marker has been created and styled
-    onEachFeature: function(feature, layer) {
-      layer.bindPopup("Magnitude: " + feature.properties.mag + "<br>Location: " + feature.properties.place);
+  // Create a layer control, pass in the baseMaps and overlayMaps. Add the layer control to the map
+  L.control.layers(baseMaps, overlayMaps, {
+    collapsed: false
+  }).addTo(myMap);
+}
+
+
+var url = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson"
+
+function getRadius(magnitude) {
+    return magnitude * 5;
+};
+
+var earthquake = new L.LayerGroup();
+
+d3.json(url, function(eqData) {
+     //console.log(eqData);
+     // Here we add a GeoJSON layer to the map once the file is loaded.
+     L.geoJSON(eqData.features,{
+       // We turn each feature into a circleMarker on the map.
+       pointToLayer:function (eqPoint, latlng) {
+         return L.circleMarker(latlng {radius: getRadius(eqPoint.properties.mag)});
+       },
+
+       // We set the style for each circleMarker using our styleInfo function.
+       style: styleInfo(eqDataFeature) {
+         return {
+           fillColor: color(eqDataFeature.properties.mag),
+           fillOpacity: 0.75,
+           weight: 0.1,
+           color: 'white'
+         }
+
+       },
+       // We create a popup for each marker to display the magnitude and location of the earthquake after the marker has been created and styled
+       onEachFeature: function (feature, layer) {
+         layer.bindPopup("Magnitude: " + feature.properties.mag + "<br>Location: " + feature.properties.place);
+       }
+     }).addTo(map);
+   });
+
+
+
+
+function color(magnitude) {
+    if (magnitude > 5) {
+        return 'red'
+    } else if (magnitude > 4) {
+        return 'darkorange'
+    } else if (magnitude > 3) {
+        return 'orange'
+    } else if (magnitude > 2) {
+        return 'yellow'
+    } else if (magnitude > 1) {
+        return 'lightyellow'
+    } else {
+        return 'green'
     }
-  }).addTo(map);
-
-  function styleInfo(feature) {
-      return {
-  }}
-  function getColor(magnitude) {
-  }
-  function getRadius(magnitude) {
-  }
-
-
-});
+};
