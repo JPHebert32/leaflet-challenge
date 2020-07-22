@@ -42,10 +42,10 @@ var darkMap = L.tileLayer("https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z
 }
 
 
-var url = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson"
+var url = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson"
 
 function getRadius(magnitude) {
-    return magnitude * 5;
+    return magnitude * 3;
 };
 
 var earthquake = new L.LayerGroup();
@@ -59,7 +59,7 @@ d3.json(url, function(eqData) {
          return L.circleMarker(latlng, {radius: getRadius(eqPoint.properties.mag)});
        },
 
-       // We set the style for each circleMarker using our styleInfo function.
+       // We set the style for each circleMarker using our style function.
        style: function (eqDataFeature) {
          return {
            fillColor: color(eqDataFeature.properties.mag),
@@ -73,11 +73,13 @@ d3.json(url, function(eqData) {
        onEachFeature: function (feature, layer) {
          layer.bindPopup("Magnitude: " + feature.properties.mag + "<br>Location: " + feature.properties.place);
        }
-     }).addTo(myMap);
+     }).addTo(earthquake);
+     createMap(earthquake);
    });
 
 
 function color(magnitude) {
+    // We create a fillColor for the style function using magnitude
     if (magnitude > 5) {
         return 'red'
     } else if (magnitude > 4) {
