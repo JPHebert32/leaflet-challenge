@@ -39,6 +39,33 @@ var darkMap = L.tileLayer("https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z
   L.control.layers(baseMaps, overlayMaps, {
     collapsed: false
   }).addTo(myMap);
+
+  // Here we create a legend control object.
+  var legend = L.control({
+    position: "bottomright"
+  });
+  // Then add all the details for the legend
+  legend.onAdd = function() {
+    var div = L.DomUtil.create("div", "info legend");
+    var magnitude = [0, 1, 2, 3, 4, 5];
+    var colorKey = [
+      "#98ee00",
+      "#d4ee00",
+      "#eecc00",
+      "#ee9c00",
+      "#ea822c",
+      "#ea2c2c"
+    ];
+    // Looping through our intervals to generate a label with a colored square for each interval.
+    for (var i = 0; i < magnitude.length; i++) {
+      div.innerHTML +=
+        "<i style='background: " + colorKey[i] + "'></i> " +
+        magnitude[i] + (magnitude[i + 1] ? "&ndash;" + magnitude[i + 1] + "<br>" : "+");
+    }
+    return div;
+  };
+  // Finally, we our legend to the map.
+  legend.addTo(map);
 }
 
 
